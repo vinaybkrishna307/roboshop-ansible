@@ -1,0 +1,30 @@
+#source common.sh
+#
+#print_head install mysql
+#dnf install mysql-server -y
+#echo $?
+#
+#print_head system enable
+#systemctl enable mysqld
+#systemctl start mysqld
+#
+#print_head setting password for the data base
+#mysql_secure_installation --set-root-pass RoboShop@1
+#echo $?
+
+
+- name: Install MySQL server
+  ansible.builtin.dnf:
+    name: mysql-server
+    state: installed
+
+- name: start MySQL server
+  ansible.builtin.systemd_service:
+    name: mysqld
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: Setup root password
+  ansible.builtin.shell: mysql_secure_installation --set-root-pass RoboShop@1
+

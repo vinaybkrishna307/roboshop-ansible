@@ -1,0 +1,19 @@
+- name: Load Docker
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: docker
+
+- name: Re-create a User container
+  community.docker.docker_container:
+    name: User
+    image: public.ecr.aws/w8x4g9h7/roboshop-v3/user
+    state: started
+    recreate: true
+    published_ports:
+      - "8080:8080"
+    restart_policy: always
+
+    env:
+      MONGO: "true"
+      MONGO_URL: "mongodb://mongo-dev.mikeydevops1.online:27017/catalogue"
+      REDIS_URL: "redis://redis-dev.mikeydevops1.online:6379"
