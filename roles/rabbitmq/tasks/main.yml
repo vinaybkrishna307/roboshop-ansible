@@ -1,0 +1,36 @@
+- name: Print a custom message
+  ansible.builtin.debug:
+    msg: "Hello from Ansible!"
+
+- name: Copy RabbitMQ file
+  ansible.builtin.template:
+    src: rabbitmq.repo.j2
+    dest: /etc/yum.repos.d/rabbitmq.repo
+
+- name: Install RabbitMQ server
+  ansible.builtin.dnf:
+    name: rabbitmq-server
+    state: installed
+
+- name: Start RabbitMQ server
+  ansible.builtin.systemd_service:
+    name: rabbitmq-server
+    state: started
+
+- name: Check if RabbitMQ user exists
+  ansible.builtin.shell: rabbitmqctl list_users | grep -w roboshop
+  register: rabbitmq_user_check
+  ignore_errors: true
+
+- name: Print rabbitmq_user_check variable
+  ansible.builtin.debug:
+    var: rabbitmq_user_check
+
+
+- name: Add RabbitMQ user if not present
+  ansible.builtin.shell: rabbitmqctl add_user roboshop roboshop123
+  when: rabbitmq_user_check.rc != 0
+- name: Set permission to user
+  ansible.builtin.shell: rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
+
+

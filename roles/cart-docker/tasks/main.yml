@@ -1,0 +1,19 @@
+- name: Load Docker
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: docker
+
+- name: Re-create a Cart container
+  community.docker.docker_container:
+    name: cart
+    image: public.ecr.aws/w8x4g9h7/roboshop-v3/cart
+    state: started
+    recreate: true
+    published_ports:
+      - "8080:8080"
+    restart_policy: always
+
+    env:
+      CATALOGUE_HOST: "catalogue-dev.mikeydevops1.online"
+      CATALOGUE_PORT: "8080"
+      REDIS_HOST: "redis://redis-dev.mikeydevops1.online:6379"

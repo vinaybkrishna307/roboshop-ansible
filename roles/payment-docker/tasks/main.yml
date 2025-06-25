@@ -1,0 +1,24 @@
+- name: Load Docker
+  ansible.builtin.include_role:
+    name: common
+    tasks_from: docker
+
+- name: Restarting Payment in docker
+  community.docker.docker_container:
+    name: Payment
+    image: public.ecr.aws/w8x4g9h7/roboshop-v3/payment
+    state: started
+    recreate: true
+    published_ports:
+      - "8080:8080"
+    restart_policy: always
+
+    env:
+      CART_HOST: "cart-dev.mikeydevops1.online:8080"
+      CART_PORT: "8080"
+      USER_HOST: "user-dev.mikeydevops1.online:8080"
+      USER_PORT: "root"
+      AMQP_HOST: "rabbitmq-dev.mikeydevops1.online"
+      AMQP_USER: "roboshop"
+      AMQP_PASS: "roboshop123"
+

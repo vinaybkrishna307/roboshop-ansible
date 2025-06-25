@@ -1,0 +1,25 @@
+- name: increase disk usage
+  ansible.builtin.shell: growpart /dev/nvme0n1 4 ;lvextend -r -l 100%FREE /dev/mapper/RootVG-varVol
+  ignore_errors: yes
+
+
+- name: download docker repo file
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker.repo
+
+- name: Install Docker
+  ansible.builtin.dnf:
+      name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+          - docker-buildx-plugin
+      state: installed
+
+- name: Start Docker Service
+  ansible.builtin.systemd_service:
+    name: docker
+    state: started
+    enabled: yes
